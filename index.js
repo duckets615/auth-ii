@@ -41,3 +41,20 @@ server.post("/api/register", (req, res) => {
 			res.status(500).json({ error: "create failed" });
 		});
 });
+
+server.post("/api/login", (req, res) => {
+	const creds = req.body;
+	db("users")
+		.where({ username: creds.username })
+		.first()
+		.then(user => {
+			if (user && bcrypt.compareSync(creds.password, user.password)) {
+				const token = generateToken(user);
+				res.status(201).json({ welcome: user.username, token });
+			} else {
+				res
+					.status(500)
+					.json({ error: "Incorrect login" });
+			}
+		});
+});
