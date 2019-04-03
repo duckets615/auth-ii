@@ -67,3 +67,32 @@ server.get("/api/users", protected, checkRole("IT"), (req, res) => {
 		})
 		.catch(err => res.send(err));
 });
+
+function protected(req, res, next) {
+	const token = req.headers.authorization;
+	jwt.verify(token, jwtSecret, (err, decodedToken) => {
+		if (err) {
+			res.status(401).json({ message: "Invalid Token" });
+		} else {
+			req.decodedToken = decodedToken;
+			next();
+		}
+	});
+
+	if (token) {
+	} else {
+		res.status(401).json({ message: "No token" });
+	}
+}
+
+function checkRole(department) {
+	return function(req, res, next) {
+		if (req.decodedToken && req.decodedToken.department === department) {
+			next();
+		} else {
+			res.status(403).json({ message: "not happening" });
+		}
+	};
+}
+const port = 8000;
+server.listen(8000, () => console.log("\nProject rolling on port 8000\n"));
