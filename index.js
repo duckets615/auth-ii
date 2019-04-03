@@ -13,7 +13,6 @@ server.use(helmet());
 server.use(express.json());
 server.use(cors());
 
-
 function generateToken(user) {
 	const payload = {
 		...user.username,
