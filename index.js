@@ -26,3 +26,18 @@ function generateToken(user) {
 
 	return jwt.sign(payload, jwtSecret, JwtOptions);
 }
+
+server.post("/api/register", (req, res) => {
+	const credentials = req.body;
+	const hash = bcrypt.hashSync(credentials.password, 15);
+	credentials.password = hash;
+
+	db("users")
+		.insert(credentials)
+		.then(ids => {
+			res.status(201).json({ id: ids[0] });
+		})
+		.catch(err => {
+			res.status(500).json({ error: "create failed" });
+		});
+});
